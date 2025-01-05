@@ -11,130 +11,147 @@
       <script src="https://unpkg.com/mathjs@13.2.2/lib/browser/math.js"></script>
 
      <script src="https://cdn.plot.ly/plotly-3.0.0-rc.2.min.js" charset="utf-8"></script>
+       <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body, html {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #fff;
+    }
 
-      <style>
-        input[type=text] {
-          width: 40%;
-        }
-        .column {
-/*          float: left;*/
-          width: 50%;
-          height:70%;
-        }
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      color: #fff;
+    }
 
-      .red-text
-      {
-        color: red;
-      }
-      .row {
-        display: flex;
-      } 
+    .container {
+      margin-top: 20px;
+    }
 
-        input {
-          padding: 6px;
-        }
+    .form-control {
+      background-color: #333;
+      color: #fff;
+      border: none;
+    }
 
-        body, html, input {
-          font-family: sans-serif;
-          font-size: 11pt;
+    .form-control:focus {
+      background-color: #444;
+      color: #fff;
+    }
 
-        }
+    .btn {
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+    }
 
+    .btn:hover {
+      background-color: #45a049;
+    }
 
-        input {
-      visibility: hidden;
-      }
-        label {
-      visibility: hidden;
-      }
-        input[type=submit]{
-          visibility: visible;
-        }
+    .red-text {
+      color: red;
+      margin-top: 20px;
+    }
 
-        .Amplitude{
-          visibility: visible;
-        }
-        .Frequency{
-          visibility: visible;
-        }
+    .plot-container {
+      margin-top: 20px;
+      height: 50%;
+    }
+  </style>
+</head>
 
-
-        form {
-          margin: 20px 0;
-        }
-
-      </style>
-    </head>
-    <body>
+<body>
 
 <h1>ASUMag Core Loss Model</h1>
-     <div class="row">
-      <div class="column">
-        <select id="materialSelection">
-        <option value="A" selected="selected">3C92 (A) </option>
-        <option value="B">T37 (B)</option>
-        <option value="C">3C95 (C) </option>
-          <option value="D">79 (D) </option>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <form id="form">
+        <div class="row">
+            <div class="form-group">
+          <label for="materialSelection">Select Material:</label>
+          <select id="materialSelection" class="form-control">
+            <option value="A">3C92 (A)</option>
+            <option value="B">T37 (B)</option>
+            <option value="C">3C95 (C)</option>
+            <option value="D">79 (D)</option>
             <option value="E">ML95S (E)</option>
-    </select>
+          </select>
+        </div>
 
 
-    <select id="myDropdown">
-        <option value="option1" selected="selected">Sinusoidal </option>
-        <option value="option2">Triangular</option>
-        <option value="option3">Trapezoidal</option>
-    </select>
+          <div class="form-group">
+                  <label for="Temperature">Temperature (°C):</label>
+                  <select id="Temperature" class="form-control">
+                    <option value="option1" selected>25</option>
+                    <option value="option3">Todo</option>
+                  </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group">
+              <label for="Frequency" class="Frequency">Frequency (Hz):</label>
+              <input type="text" id="Frequency" class="form-control Frequency" value="100000">
+           </div>
+            <div class="form-group">
+              <label for="Amplitude" class="Amplitude">Amplitude (T):</label>
+              <input type="text" id="Amplitude" class="form-control Amplitude" value="0.1">
+            </div>
+        </div>
+      <div class='row'>
+          <div class="form-group">
+          <label for="myDropdown">Waveform Type:</label>
+          <select id="myDropdown" class="form-control">
+            <option value="option1" selected>Sinusoidal</option>
+            <option value="option2">Triangular</option>
+            <option value="option3">Trapezoidal</option>
+          </select>
+        </div>
+      </div>
+       <div class="row">
+         
+          <div class="form-group">
+            <label for="duty" class="duty">Duty:</label>
+                  <input type="text" id="duty" class="form-control duty" value="0.5">
+                </div>
+        </div>
+        <div class="row">
+                <div class="form-group">
+                  <label for="duty1" class="duty1">Duty 1:</label>
+                  <input type="text" id="duty1" class="form-control duty1" value="0.2">
+                </div>
 
-    <select id="Temperaure">
-        <option value="option1" selected="selected">25 </option>
-        <option value="option3">Todo</option>
-    </select>
+                <div class="form-group">
+                  <label for="duty2" class="duty2">Duty 2:</label>
+                  <input type="text" id="duty2" class="form-control duty2" value="0.2">
+                </div>
+       </div>
+      
+        <p>Core loss estimated: <span id="corelossout"></span> kW/m<sup>3</sup></p>
+        <input type="submit" value="Calculate" class="btn btn-block" id="submission">
+      </form>
 
-       <div>
-          <form id="form">
-                <label for="Frequency" class="Frequency">Frequency(Hz): </label>
-                <input type="text" id="Frequency" class="Frequency" value="100000" /> </br>
-
-
-                <label for="Amplitude" class="Amplitude">Amplitude(T): </label>
-                <input type="text" id="Amplitude" class="Amplitude" value="0.1" /> </br>
-
-                <label for="duty", class="duty"> duty: </label>
-                  <input type="text" id="duty" class="duty" value="0.5" /> </br>
-                <label for="duty1", class="duty1">duty 1: </label>
-                <input type="text" id="duty1" class="duty1" value="0.2" /> </br>
-                  
-                <label for="duty2", class="duty2"> duty 2: </label> 
-                  <input type="text" id="duty2" class="duty2" value="0.2" />  </br>
-
-              <p> Core loss estimated <span id="corelossout"></span> kW/m^3</p>
-
-             <input type="submit" value="Calculate" id="submission" />
-          </form>
+  
     </div>
 
-       <div>
-
-          <p class="red-text">
-                  The model was modified for web embedding and currently only 5 materials and 25 C is added to web. <b>(Note: this run on client side)</b>
-         </p>
-          <p>To campare outputs,other toolsfrom Magnet Challenge can be found at <a href="https://magnet-engine-app.sydney.edu.au/">https://magnet-engine-app.sydney.edu.au/</a></p>
-          <p>Model: <a href="https://github.com/minjiechen/magnetchallenge/tree/main/models/ASU">https://github.com/minjiechen/magnetchallenge/tree/main/models/ASU</a> </p>
-       </div>
+    <div class="col-md-6 plot-container">
+      <div id="plot"></div>
+      <p>Used plot library: <a href="https://plot.ly/javascript/">Plotly</a></p>
+    </div>
+  </div>
+  <div class="row">
+        <div class="red-text">
+        The model was modified for web embedding and currently only 5 materials and 25°C is added to web. <b>(Note: this runs on the client side)</b>
       </div>
-      <div class="column">
-        
-            <div id="plot"></div>
+      <p>To compare outputs, other tools from Magnet Challenge can be found at <a href="https://magnet-engine-app.sydney.edu.au/">https://magnet-engine-app.sydney.edu.au/</a></p>
+      <p>Model: <a href="https://github.com/minjiechen/magnetchallenge/tree/main/models/ASU">https://github.com/minjiechen/magnetchallenge/tree/main/models/ASU</a></p>
+  </div>
 
-            <p>
-              Used plot library: <a href="https://plot.ly/javascript/">Plotly</a>
-            </p>
-
-
-      </div>
-
-    </div> 
-   
+</div>
     <script>
 
       // document.addEventListener('DOMContentLoaded', function() {
@@ -223,7 +240,6 @@
           Amplitude.style.visibility = "visible";
       
         } 
-        // Add more cases for other options
       });
 
 
@@ -305,16 +321,20 @@
                     console.log("duty1", i,duty1,out[i])
 
                   }
-                  else if ((i*10>duty1)&&(i*10<(240-duty2)))
+                  else if ((i*10>duty1)&&(i*10<(230-duty2)))
                       {
                         out[i]=A;
                        console.log("zero volt", i,out[i])
 
                       }
                   else{
-                    out[i]=part2[(i*10-1-(240-duty2))]
+                    if ((i*10-1-(230-duty2)>0))
+                      {out[i]=part2[(i*10-1-(230-duty2))]}
+                    else{
+                      out[i]=part2[0]
+                    }
                   console.log("part 2", part2)
-                  console.log("duty 2",-2*A/duty2,i*10+1-duty2, i,out[i])
+                  console.log("duty 2",duty2,-2*A/duty2,(i*10-1-(230-duty2)), i,out[i])
                   }
                   // console.log(i,out[i],i*10,duty1,duty2
               } 
@@ -477,7 +497,32 @@
           paragraph.textContent=(output/1000).toFixed(2);
           // render the plot using plotly
 
-          const layout = {
+           const layout = {
+             font: {
+    color: 'white'
+  },
+        xaxis: {
+          title: { text: 'Time (s)' },
+          showgrid: true,
+          gridcolor: '#444',
+          gridwidth: 1
+        },
+        yaxis: {
+          title: { text: 'B (T)' },
+          showgrid: true,
+          // gridcolor: '#000',
+          gridcolor: '#444',
+
+          gridwidth: 1
+        },
+        title: { text: 'Plot of B(T) vs Time(s)' },
+         paper_bgcolor: 'rgba(250,250, 255, 0.5)', // paper background
+         plot_bgcolor: 'rgba(0, 0, 0, 1.0)' //  plot background
+      };
+
+
+
+          const layout2 = {
             xaxis: {title: { text: 'Time (s)'}},
             yaxis: { title: {text: 'B (T)'}},
             title: {text: 'Plot of B(T) vs Time(s)'}
